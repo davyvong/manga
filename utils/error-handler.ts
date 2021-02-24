@@ -1,3 +1,3 @@
 export default function errorHandler(error: Error) {
-  console.log(error.toString());
+  console.log(error.toString().toLowerCase());
 }

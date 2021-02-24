@@ -77,10 +77,49 @@ export default class BaseProcessor {
 
   protected async _processData(task: RSMQMessage): Promise<void> {
     const message = JSON.parse(task.message);
+    if (message.mangaId) {
+      await this._processMangaData(task);
+    } else if (message.chapterId) {
+      await this._processChapterData(task);
+    }
+  }
+
+  protected async _processChapterData(task: RSMQMessage): Promise<void> {
+    const message = JSON.parse(task.message);
+    const chapter = await this.sourceAPI.getChapter(message.chapterId)
+      .catch(errorHandler);
+    if (!chapter || chapter.pageList.length === 0) {
+      return;
+    }
+    const chapterUpdateResults = await this._updateOne(
+      source + "Chapters",
+      {
+        sourceChapterId: chapter.sourceChapterId,
+        sourceMangaId: chapter.sourceMangaId,
+      },
+      { $set: chapter },
+    );
+    if (chapterUpdateResults.upsertedId) {
+      console.log(
+        "inserted",
+        chapter.title.toLowerCase(),
+        `(ch ${chapter.chapterIndex})`,
+      );
+      await this._updateOne(
+        source + "Mangas",
+        { sourceMangaId: chapter.sourceMangaId },
+        { $set: { browseIndex: this._getBrowseIndex() } },
+      );
+    }
+  }
+
+  protected async _processMangaData(task: RSMQMessage): Promise<void> {
+    const message = JSON.parse(task.message);
     const manga = await this.sourceAPI.getManga(message.mangaId)
       .catch(errorHandler);
     if (!manga) {
-      return this._retryTask(task);
+      await this._retryTask(task);
+      return;
     }
     if (manga.isNSFW) {
       console.log("skipping", manga.title.toLowerCase());
@@ -90,7 +129,8 @@ export default class BaseProcessor {
     let chapterList = await this.sourceAPI.getChapterList(message.mangaId)
       .catch(errorHandler);
     if (!chapterList) {
-      return this._retryTask(task);
+      await this._retryTask(task);
+      return;
     }
     if (chapterList.length === 0) {
       console.log("skipping", manga.title.toLowerCase());
@@ -130,7 +170,7 @@ export default class BaseProcessor {
         );
         await this._updateOne(
           source + "Mangas",
-          { sourceMangaId: manga.sourceMangaId },
+          { sourceMangaId: chapter.sourceMangaId },
           { $set: { browseIndex: this._getBrowseIndex() } },
         );
       }

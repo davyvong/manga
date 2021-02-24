@@ -28,22 +28,25 @@ export async function reimportById(id: string): Promise<void> {
 export async function reimportByChapterId(id: string): Promise<boolean> {
   const chapterDoc = await chapterCollection.findOne({ _id: ObjectId(id) });
   if (!chapterDoc) return false;
-  await sendMessage(source, chapterDoc.sourceMangaId);
+  await sendMessage(source, { chapterId: chapterDoc.sourceChapterId });
   return true;
 }
 
 export async function reimportByMangaId(id: string): Promise<boolean> {
   const mangaDoc = await mangaCollection.findOne({ _id: ObjectId(id) });
   if (!mangaDoc) return false;
-  await sendMessage(source, mangaDoc.sourceMangaId);
+  await sendMessage(source, { mangaId: mangaDoc.sourceMangaId });
   return true;
 }
 
-async function sendMessage(queueName: string, mangaId: string): Promise<void> {
+async function sendMessage(
+  queueName: string,
+  message: Record<string, string>,
+): Promise<void> {
   if (!await messageQueue.getQueue(queueName)) {
     await messageQueue.createQueue({ name: queueName });
   }
-  await messageQueue.sendMessage(queueName, JSON.stringify({ mangaId }));
+  await messageQueue.sendMessage(queueName, JSON.stringify(message));
 }
 
 if (Deno.args.length > 0) {
