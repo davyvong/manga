@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+  <head>
+    <%- include("./common/head.ejs")  %>
+    <title><%- chapter.title %></title>
+    <meta property="og:description" content="<%- chapter.title %>">
+    <meta property="og:image" content="<%= manga.imageUrl.replace(/\.(gif|jpg|jpeg|png)/, ".thumb.jpg") %>">
+    <meta property="og:title" content="<%- manga.title %>">
+    <meta property="og:url" content="https://manga.davyvong.com/chapters/<%= chapter._id.$oid %>">
+    <meta name="twitter:card" content="summary" />
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lozad/dist/lozad.min.js"></script>
+    <style>
+      .lazy {
+        min-height: 500px;
+      }
+      .lazy[data-loaded="true"] {
+        min-height: auto;
+      }
+      .page {
+        display: block;
+        width: 100%;
+      }
+      .page-list {
+        margin: 0 -1.5rem;
+      }
+      .pagination-button {
+        border: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <%- include("./common/navbar.ejs") %>
+    <section class="section">
+      <div class="container">
+        <nav class="breadcrumb">
+          <ul>
+            <li><a href="/mangas/<%= manga._id.$oid %>"><%- manga.title %></a></li>
+            <li class="is-active"><a><%- chapter.title %></a></li>
+          </ul>
+        </nav>
+	<div class="page-list">
+          <% for(let i = 0; i < chapter.pageList.length; i++) { %>
+          <img alt="Page <%= i + 1 %>" class="lazy page" referrerPolicy="no-referrer" data-src="<%= chapter.serverUrl + chapter.pageList[i] %>" />
+          <% } %>
+	</div>
+        <nav class="pagination is-centered mt-6">
+          <% if (previous) { %>
+          <a class="pagination-previous" href="/chapters/<%= previous._id.$oid %>">Previous Chapter</a>
+          <% } %>
+          <% if (next) { %>
+          <a class="pagination-next" href="/chapters/<%= next._id.$oid %>">Next Chapter</a>
+          <% } %>
+        </nav>
+      </div>
+    </section>
+    <script type="text/javascript">
+      const observer = lozad('.lazy');
+      observer.observe();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+  <head>
+    <%- include("./common/head.ejs")  %>
+    <title><%- manga.title %></title>
+    <meta property="og:description" content="<%- manga.description.replace(/(\[.*?\])/g, " ") %>">
+    <meta property="og:image" content="<%= manga.imageUrl.replace(/\.(gif|jpg|jpeg|png)/, ".thumb.jpg") %>">
+    <meta property="og:title" content="<%- manga.title %>">
+    <meta property="og:url" content="https://manga.davyvong.com/mangas/<%= manga._id.$oid %>">
+    <meta name="twitter:card" content="summary" />
+    <style>
+      .has-round-corners {
+        border-radius: 0.5rem;
+      }
+      .thumbnail {
+        max-width: 12rem;
+      }
+      [data-href]:hover {
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <%- include("./common/navbar.ejs") %>
+    <section class="section">
+      <div class="container">
+        <div class="columns is-tablet">
+          <div class="column is-4">
+            <img alt="<%- manga.title %>" class="image has-round-corners" referrerPolicy="no-referrer" src="<%= manga.imageUrl %>">
+          </div>
+          <div class="column is-8">
+            <div class="has-text-primary has-text-weight-bold is-size-6 is-uppercase pb-1"><%= manga.isFinished ? "Completed" : "Ongoing" %></div>
+            <a class="has-text-truncate has-text-weight-semibold is-size-4"><%- manga.title %></a>
+            <div class="has-text-truncate pt-1"><%- manga.description.replace(/(\[.*?\])/g, " ") %></div>
+            <div class="pt-1">Author: <%- manga.author %></div>
+            <div class="pt-1">Genres: <%- manga.genres.join(", ") %></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <% if (chapters.length > 0) { %>
+    <section class="section">
+      <div class="container">
+        <table class="table is-fullwidth is-hoverable is-striped">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Title</th>
+              <th>Uploader</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% for(let i = 0; i < chapters.length; i++) { %>
+              <tr data-href="/chapters/<%= chapters[i]._id.$oid %>">
+                <td><%= chapters[i].chapterIndex %></td>
+                <td><%= chapters[i].title %></td>
+                <td><%= chapters[i].sourceUploader %></td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <% } %>
+    <script>
+      const matches = document.querySelectorAll('[data-href]');
+      function createClickHandler(href) {
+        return function() {
+          if (href) {
+            location.href = href;
+          }
+        }
+      }
+      for (let i = 0; i < matches.length; i++) {
+        matches[i].onclick = createClickHandler(matches[i].getAttribute('data-href'));
+      }
+    </script>
+  </body>
+</html>

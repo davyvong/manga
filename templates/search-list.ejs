@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+  <head>
+    <%- include("./common/head.ejs")  %>
+    <title>Browse</title>
+    <meta property="og:description" content="<%= keywords %>">
+    <meta property="og:title" content="Search">
+    <meta property="og:url" content="https://manga.davyvong.com/search/<%= keywords %>">
+    <meta name="twitter:card" content="summary" />
+    <script>
+      function onSearch(event) {
+        event.preventDefault();
+        const keywords = document.getElementById("keywords").value;
+        window.location.href = "/search/" + encodeURIComponent(keywords);
+      }
+    </script>
+    <style>
+      .row {
+        display: flex;
+        flex-direction: row;
+      }
+      .media + .media {
+        border-top: 0;
+        margin-top: 0;
+      }
+      .has-round-corners {
+        border-radius: 0.5rem;
+      }
+      .has-text-truncate {
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+      }
+      #form {
+        margin: 0 auto;
+        max-width: 768px;
+      }
+    </style>
+  </head>
+  <body>
+    <%- include("./common/navbar.ejs") %>
+    <section class="section">
+      <div class="container">
+        <form id="form">
+          <div class="field has-addons mb-6">
+            <div class="control is-expanded">
+              <input class="input" id="keywords" type="text" placeholder="Keywords" value="<%= keywords %>">
+            </div>
+            <div class="control">
+              <button type="submit" class="button is-link">Search</button>
+            </div>
+          </div>
+        </form>
+        <% for(let i = 0; i < list.length; i++) { %>
+        <% if (i % 2 === 0) { %>
+        <div class="tile is-ancestor">
+        <% } %>
+          <article class="media tile row is-6 p-3">
+            <figure class="media-left mr-5">
+              <a href="/mangas/<%= list[i]._id.$oid %>">
+                <img alt="<%- list[i].title %>" class="has-round-corners image" referrerPolicy="no-referrer" src="<%= list[i].imageUrl.replace(/\.(gif|jpg|jpeg|png)/, ".thumb.jpg") %>">
+              </a>
+            </figure>
+            <div class="media-content">
+              <div class="has-text-primary has-text-weight-bold is-size-6 is-uppercase pb-1"><%= list[i].isFinished ? "Completed" : "Ongoing" %></div>
+              <a class="has-text-truncate has-text-weight-semibold is-size-5" href="/mangas/<%= list[i]._id.$oid %>"><%- list[i].title %></a>
+              <div class="has-text-truncate pt-1"><%- list[i].description.replace(/(\[.*?\])/g, " ") %></div>
+            </div>
+          </article>
+        <% if (i % 2 === 1) { %>
+        </div>
+        <% } %>
+        <% } %>
+      </div>
+    </section>
+    <script>
+      document.getElementById("form").addEventListener("submit", onSearch);
+    </script>
+  </body>
+</html>

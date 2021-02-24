@@ -1,0 +1,35 @@
+{
+  "$schema": "https://deno.land/x/denon/schema.json",
+  "scripts": {
+    "start:aggregator": {
+      "allow": ["env", "net", "read", "plugin", "write"],
+      "cmd": "deno run services/aggregator.ts",
+      "unstable": true
+    },
+    "start:twitter": {
+      "allow": ["env", "net", "read", "plugin", "write"],
+      "cmd": "deno run -c tsconfig.json services/twitter.ts",
+      "unstable": true
+    },
+    "start:web": {
+      "allow": ["env", "net", "read", "plugin", "write"],
+      "cmd": "deno run services/web.ts",
+      "unstable": true
+    },
+    "dump": {
+      "allow": ["net", "read", "write"],
+      "cmd": "deno run scripts/dump.ts",
+      "unstable": true
+    },
+    "purge": {
+      "allow": ["env", "net", "read", "plugin", "write"],
+      "cmd": "deno run scripts/purge.ts",
+      "unstable": true
+    },
+    "reimport": {
+      "allow": ["env", "net", "read", "plugin", "write"],
+      "cmd": "deno run scripts/reimport.ts",
+      "unstable": true
+    }
+  }
+}

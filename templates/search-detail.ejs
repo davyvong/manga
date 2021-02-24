@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+  <head>
+    <%- include("./common/head.ejs")  %>
+    <title>Browse</title>
+    <meta property="og:description" content="">
+    <meta property="og:title" content="Search">
+    <meta property="og:url" content="https://manga.davyvong.com/search">
+    <meta name="twitter:card" content="summary" />
+    <script>
+      function onSearch(event) {
+        event.preventDefault();
+        const keywords = document.getElementById("keywords").value;
+        window.location.href = "/search/" + encodeURIComponent(keywords);
+      }
+    </script>
+    <style>
+      #form {
+        margin: 0 auto;
+        max-width: 768px;
+      }
+    </style>
+  </head>
+  <body>
+    <%- include("./common/navbar.ejs") %>
+    <section class="section">
+      <div class="container">
+        <form id="form">
+          <div class="field has-addons">
+            <div class="control is-expanded">
+              <input class="input" id="keywords" type="text" placeholder="Keywords">
+            </div>
+            <div class="control">
+              <button class="button is-link" type="submit">Search</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+    <script>
+      document.getElementById("form").addEventListener("submit", onSearch);
+    </script>
+  </body>
+</html>
