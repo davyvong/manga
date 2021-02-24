@@ -2,9 +2,9 @@
   "$schema": "https://deno.land/x/denon/schema.json",
   "watch": false,
   "scripts": {
-    "start:aggregator": {
+    "start:ingestion": {
       "allow": ["env", "net", "read", "plugin", "write"],
-      "cmd": "deno run services/aggregator.ts",
+      "cmd": "deno run services/ingestion.ts",
       "unstable": true
     },
     "start:twitter": {
