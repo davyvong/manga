@@ -28,6 +28,7 @@ export class BaseChapter {
 
 export class BaseManga {
   public author: string;
+  public browseIndex?: number;
   public description: string;
   public genres: string[] = [];
   public id?: string;
@@ -39,6 +40,7 @@ export class BaseManga {
 
   constructor(data: BaseMangaData, id?: string) {
     this.author = data.author;
+    this.browseIndex = data.browseIndex;
     this.description = data.description;
     this.genres = data.genres;
     this.id = id;

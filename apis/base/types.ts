@@ -16,6 +16,7 @@ export type BaseChapterData = {
 
 export type BaseMangaData = {
   author: string;
+  browseIndex?: number;
   description: string;
   genres: string[];
   imageUrl?: string;

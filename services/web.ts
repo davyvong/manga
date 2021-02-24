@@ -59,8 +59,9 @@ router
     );
   })
   .get("/chapters/:chapterId", async (context) => {
-    const chapterId = ObjectId(String(context.params.chapterId));
-    const chapterDoc = await chapterCollection.findOne({ _id: chapterId });
+    const { chapterId } = context.params;
+    await reimportByChapterId(chapterId!);
+    const chapterDoc = await chapterCollection.findOne({ _id: ObjectId(chapterId!) });
     if (chapterDoc === null) return;
     const [previousChapter] = await chapterCollection.aggregate([
       {
@@ -97,14 +98,10 @@ router
       },
     );
   })
-  .get("/chapters/:chapterId/reimport", async (context) => {
-    const { chapterId } = context.params;
-    await reimportByChapterId(chapterId!);
-    context.response.redirect("/chapters/" + chapterId);
-  })
   .get("/mangas/:mangaId", async (context) => {
-    const mangaId = ObjectId(String(context.params.mangaId));
-    const mangaDoc = await mangaCollection.findOne({ _id: mangaId });
+    const { mangaId } = context.params;
+    await reimportByMangaId(mangaId!);
+    const mangaDoc = await mangaCollection.findOne({ _id: ObjectId(mangaId!) });
     if (mangaDoc === null) return;
     const chapters = await chapterCollection.aggregate([
       { $match: { sourceMangaId: mangaDoc.sourceMangaId } },
@@ -115,11 +112,6 @@ router
       "./templates/manga-detail.ejs",
       { chapters, manga: mangaDoc },
     );
-  })
-  .get("/mangas/:mangaId/reimport", async (context) => {
-    const { mangaId } = context.params;
-    await reimportByMangaId(mangaId!);
-    context.response.redirect("/mangas/" + mangaId);
   })
   .get("/search", async (context) => {
     context.render("./templates/search-detail.ejs");

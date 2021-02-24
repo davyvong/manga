@@ -111,7 +111,7 @@ export default class BaseProcessor {
       const chapterId = chapterList[i];
       const chapter = await this.sourceAPI.getChapter(chapterId)
         .catch(console.warn);
-      if (!chapter) {
+      if (!chapter || chapter.pageList.length === 0) {
         continue;
       }
       const chapterUpdateResults = await this._updateOne(
