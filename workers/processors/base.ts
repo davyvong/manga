@@ -88,9 +88,15 @@ export default class BaseProcessor {
     const message = JSON.parse(task.message);
     const chapter = await this.sourceAPI.getChapter(message.chapterId)
       .catch(errorHandler);
-    if (!chapter || chapter.pageList.length === 0) {
+    if (!chapter) {
+      await this._retryTask(task);
       return;
     }
+    if (chapter.pageList.length === 0) {
+      console.log("skipping", chapter.title.toLowerCase());
+      return;
+    }
+    console.log("processing", chapter.title.toLowerCase());
     const chapterUpdateResults = await this._updateOne(
       source + "Chapters",
       {
@@ -125,7 +131,6 @@ export default class BaseProcessor {
       console.log("skipping", manga.title.toLowerCase());
       return;
     }
-    console.log("processing", manga.title.toLowerCase());
     let chapterList = await this.sourceAPI.getChapterList(message.mangaId)
       .catch(errorHandler);
     if (!chapterList) {
@@ -136,6 +141,7 @@ export default class BaseProcessor {
       console.log("skipping", manga.title.toLowerCase());
       return;
     }
+    console.log("processing", manga.title.toLowerCase());
     const mangaUpdateResults = await this._updateOne(
       source + "Mangas",
       { sourceMangaId: manga.sourceMangaId },
