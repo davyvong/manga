@@ -17,6 +17,7 @@ import type {
   RSMQQueueOptions,
 } from "./types.ts";
 import { clamp, randomString } from "./utils.ts";
+import errorHandler from "../../utils/error-handler.ts";
 
 export default class RSMQ extends EventEmitter {
   private namespace = "rsmq";
@@ -153,7 +154,7 @@ export default class RSMQ extends EventEmitter {
   }
 
   public async getQueue(name: string): Promise<RSMQQueue | void> {
-    const queue = this._getQueue(name).catch(console.warn);
+    const queue = this._getQueue(name).catch(errorHandler);
     if (queue) {
       return queue;
     }

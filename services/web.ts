@@ -61,7 +61,9 @@ router
   .get("/chapters/:chapterId", async (context) => {
     const { chapterId } = context.params;
     await reimportByChapterId(chapterId!);
-    const chapterDoc = await chapterCollection.findOne({ _id: ObjectId(chapterId!) });
+    const chapterDoc = await chapterCollection.findOne({
+      _id: ObjectId(chapterId!),
+    });
     if (chapterDoc === null) return;
     const [previousChapter] = await chapterCollection.aggregate([
       {

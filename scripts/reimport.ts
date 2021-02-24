@@ -6,6 +6,7 @@ import type { BaseChapter, BaseManga } from "../apis/base/models.ts";
 import RSMQ from "../packages/rsmq/mod.ts";
 import connectToMongoDB from "../utils/connect-to-mongo.ts";
 import connectToRedis from "../utils/connect-to-redis.ts";
+import errorHandler from "../utils/error-handler.ts";
 import isMongoId from "../utils/is-mongoid.ts";
 
 const mongoDB = await connectToMongoDB();
@@ -20,8 +21,8 @@ const queueName = "mangadex";
 await messageQueue.createQueue({ name: queueName });
 
 export async function reimportById(id: string): Promise<void> {
-  await reimportByChapterId(id).catch(console.warn);
-  await reimportByMangaId(id).catch(console.warn);
+  await reimportByChapterId(id).catch(errorHandler);
+  await reimportByMangaId(id).catch(errorHandler);
 }
 
 export async function reimportByChapterId(id: string): Promise<boolean> {

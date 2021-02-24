@@ -36,9 +36,7 @@ async function deleteOrphanChapters(): Promise<void> {
           { sourceMangaId: chapter.sourceMangaId },
         );
         if (manga === null) {
-          console.log(
-            `${skipChapter} > delete(sourceMangaId: ${chapter.sourceMangaId})`,
-          );
+          console.log(`deleted sourceMangaId: ${chapter.sourceMangaId}`);
           await chapterCollection.deleteMany({
             sourceMangaId: chapter.sourceMangaId,
           });
@@ -53,7 +51,6 @@ async function deleteOrphanChapters(): Promise<void> {
 
 async function deleteOrphanMangas(): Promise<void> {
   while (true) {
-    console.log(`(${skipManga})`);
     const mangaList = await mangaCollection.aggregate([
       { $project: { _id: 1, sourceMangaId: 1, title: 1 } },
       { $skip: skipManga },
@@ -69,9 +66,7 @@ async function deleteOrphanMangas(): Promise<void> {
         { sourceMangaId: manga.sourceMangaId },
       );
       if (chapterCount === 0) {
-        console.log(
-          `(${skipManga}) > delete(sourceMangaId: ${manga.sourceMangaId})`,
-        );
+        console.log(`deleted sourceMangaId: ${manga.sourceMangaId})`);
         await mangaCollection.deleteOne({ sourceMangaId: manga.sourceMangaId });
         adjustSkip--;
       }
@@ -80,8 +75,11 @@ async function deleteOrphanMangas(): Promise<void> {
   }
 }
 
+console.log("deleting inactive mangas");
 await mangaCollection.deleteMany({ browseIndex: { $lt: 1607836968244 } });
-await deleteOrphanChapters();
-
+console.log("deleting empty chapters");
 await chapterCollection.deleteMany({ pageList: { $exists: true, $size: 0 } });
+console.log("deleting orphan chapters");
+await deleteOrphanChapters();
+console.log("deleting orphan mangas");
 await deleteOrphanMangas();

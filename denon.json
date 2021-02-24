@@ -1,5 +1,6 @@
 {
   "$schema": "https://deno.land/x/denon/schema.json",
+  "watch": false,
   "scripts": {
     "start:aggregator": {
       "allow": ["env", "net", "read", "plugin", "write"],

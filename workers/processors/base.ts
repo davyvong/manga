@@ -2,13 +2,13 @@ import type {
   Database,
   FilterType,
 } from "https://deno.land/x/mongo@v0.12.1/mod.ts";
-import merge from "https://cdn.skypack.dev/lodash.merge@^4.6.2";
 
 import type { BaseAPIInterface } from "../../apis/base/mod.ts";
 import RSMQ from "../../packages/rsmq/mod.ts";
 import type { RSMQMessage } from "../../packages/rsmq/types.ts";
 import connectToMongoDB from "../../utils/connect-to-mongo.ts";
 import connectToRedis from "../../utils/connect-to-redis.ts";
+import errorHandler from "../../utils/error-handler.ts";
 
 export type BaseProcessorOptions = {
   queueName: string;
@@ -78,7 +78,7 @@ export default class BaseProcessor {
   protected async _processData(task: RSMQMessage): Promise<void> {
     const message = JSON.parse(task.message);
     const manga = await this.sourceAPI.getManga(message.mangaId)
-      .catch(console.warn);
+      .catch(errorHandler);
     if (!manga) {
       return this._retryTask(task);
     }
@@ -88,7 +88,7 @@ export default class BaseProcessor {
     }
     console.log("processing", manga.title.toLowerCase());
     let chapterList = await this.sourceAPI.getChapterList(message.mangaId)
-      .catch(console.warn);
+      .catch(errorHandler);
     if (!chapterList) {
       return this._retryTask(task);
     }
@@ -110,7 +110,7 @@ export default class BaseProcessor {
     for (let i = 0; i < chapterList.length; i++) {
       const chapterId = chapterList[i];
       const chapter = await this.sourceAPI.getChapter(chapterId)
-        .catch(console.warn);
+        .catch(errorHandler);
       if (!chapter || chapter.pageList.length === 0) {
         continue;
       }

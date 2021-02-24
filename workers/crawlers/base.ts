@@ -1,6 +1,7 @@
 import type { BaseAPIInterface } from "../../apis/base/mod.ts";
 import RSMQ from "../../packages/rsmq/mod.ts";
 import connectToRedis from "../../utils/connect-to-redis.ts";
+import errorHandler from "../../utils/error-handler.ts";
 
 export type BaseCrawlerOptions = {
   currentPage?: number;
@@ -68,8 +69,9 @@ export default class BaseCrawler {
       setTimeout(this._fetchBrowseData, 1000);
     }
     console.log(`fetching page ${this.currentPage}`);
-    const mangaList = await this.sourceAPI.getMangaList(this.currentPage)
-      .catch(console.warn);
+    const mangaList = await this.sourceAPI.getMangaList(this.currentPage).catch(
+      errorHandler,
+    );
     if (!mangaList) {
       setTimeout(this._fetchBrowseData, this.retryFetchInterval);
       return;
@@ -89,7 +91,7 @@ export default class BaseCrawler {
       setTimeout(this._fetchUpdateData, 1000);
     }
     console.log("fetching updates");
-    const mangaList = await this.sourceAPI.getUpdateList().catch(console.warn);
+    const mangaList = await this.sourceAPI.getUpdateList().catch(errorHandler);
     if (!mangaList) {
       setTimeout(this._fetchUpdateData, this.retryFetchInterval);
       return;
@@ -110,7 +112,7 @@ export default class BaseCrawler {
       await this.messageQueue.sendMessage(
         this.queueName,
         JSON.stringify({ limit, mangaId }),
-      ).catch(console.warn);
+      ).catch(errorHandler);
     }
   }
 }

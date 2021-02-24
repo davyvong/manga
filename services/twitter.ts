@@ -5,6 +5,7 @@ import type { WithID } from "https://deno.land/x/mongo@v0.12.1/ts/collection.ts"
 import type { BaseChapter } from "../apis/base/models.ts";
 import TwitterAPI from "../apis/twitter/mod.ts";
 import connectToMongoDB from "../utils/connect-to-mongo.ts";
+import errorHandler from "../utils/error-handler.ts";
 
 const twitterAPI = new TwitterAPI({
   accessTokenKey: Deno.env.get("TWITTER_ACCESS_TOKEN")!,
@@ -39,7 +40,7 @@ async function checkForLatest(): Promise<void> {
       `Chapter ${chapter.chapterIndex} is out!\nmanga.davyvong.com/chapters/${chapter._id.$oid}`;
     for (let i = 0; i < recipientList.length; i++) {
       await twitterAPI.sendDirectMessage(message, recipientList[i]).catch(
-        console.log,
+        errorHandler,
       );
     }
   }
