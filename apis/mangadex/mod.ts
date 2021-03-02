@@ -16,7 +16,9 @@ export default class MangaDexAPI extends BaseAPI {
 
   public async getChapter(chapterId: string): Promise<MangaDexChapter> {
     const endpointUrl = new URL(`/api/v2/chapter/${chapterId}`, this.baseUrl);
-    const response = await this._fetch(endpointUrl, {});
+    const searchParams = new URLSearchParams();
+    searchParams.append("saver", "true");
+    const response = await this._fetch(endpointUrl, { body: searchParams });
     const { data } = await response.json();
     return new MangaDexChapter(data);
   }
