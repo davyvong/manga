@@ -9,7 +9,7 @@ import {
 } from "https://raw.githubusercontent.com/deligenius/view-engine/master/mod.ts";
 
 import type { BaseChapter, BaseManga } from "../apis/base/models.ts";
-import { reimportByChapterId, reimportByMangaId } from "../scripts/reimport.ts";
+import { reimportByChapterId } from "../scripts/reimport.ts";
 import connectToMongoDB from "../utils/connect-to-mongo.ts";
 
 const app = new Application();
@@ -102,7 +102,6 @@ router
   })
   .get("/mangas/:mangaId", async (context) => {
     const { mangaId } = context.params;
-    await reimportByMangaId(mangaId!);
     const mangaDoc = await mangaCollection.findOne({ _id: ObjectId(mangaId!) });
     if (mangaDoc === null) return;
     const chapters = await chapterCollection.aggregate([
