@@ -11,6 +11,7 @@ import {
 import type { BaseChapter, BaseManga } from "../apis/base/models.ts";
 import { reimportByChapterId } from "../scripts/reimport.ts";
 import connectToMongoDB from "../utils/connect-to-mongo.ts";
+import errorHandler from "../utils/error-handler.ts";
 
 const app = new Application();
 const router = new Router();
@@ -60,11 +61,11 @@ router
   })
   .get("/chapters/:chapterId", async (context) => {
     const { chapterId } = context.params;
-    await reimportByChapterId(chapterId!);
+    await reimportByChapterId(chapterId!).catch(errorHandler);
     const chapterDoc = await chapterCollection.findOne({
       _id: ObjectId(chapterId!),
     });
-    if (chapterDoc === null) return;
+    if (!chapterDoc) return;
     const [previousChapter] = await chapterCollection.aggregate([
       {
         $match: {
@@ -103,7 +104,7 @@ router
   .get("/mangas/:mangaId", async (context) => {
     const { mangaId } = context.params;
     const mangaDoc = await mangaCollection.findOne({ _id: ObjectId(mangaId!) });
-    if (mangaDoc === null) return;
+    if (!mangaDoc) return;
     const chapters = await chapterCollection.aggregate([
       { $match: { sourceMangaId: mangaDoc.sourceMangaId } },
       { $project: { _id: 1, chapterIndex: 1, sourceUploader: 1, title: 1 } },

@@ -31,10 +31,10 @@ async function deleteOrphanChapters(): Promise<void> {
     for (let i = 0; i < chapterList.length; i++) {
       const chapter = <BaseChapter & WithID> chapterList[i];
       if (chapterOrphanMap[chapter.sourceMangaId] === undefined) {
-        const manga = await mangaCollection.findOne(
+        const mangaDoc = await mangaCollection.findOne(
           { sourceMangaId: chapter.sourceMangaId },
         );
-        if (manga === null) {
+        if (!mangaDoc) {
           console.log(`delete sourceMangaId: ${chapter.sourceMangaId}`);
           await chapterCollection.deleteMany({
             sourceMangaId: chapter.sourceMangaId,
